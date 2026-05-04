@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     
     # Local storage configuration
     UPLOAD_DIR: str = "uploads"
+    BACKEND_URL: str = "http://127.0.0.1:8000"
     
     class Config:
         env_file = ".env"

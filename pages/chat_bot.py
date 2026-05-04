@@ -2,11 +2,8 @@
 import streamlit as st
 import logging
 from const import Constants
-import uuid
 import requests
 from config import settings
-import re
-import os
 
 # Initialize Logging
 logging.basicConfig(level=logging.INFO)
@@ -47,23 +44,12 @@ if uploaded_file is not None and st.session_state.processed_file is False:
         try:
             with st.spinner("Extracting the text ...."):
                 
-                # Sanitize filename 
-                filename = re.sub(r'[^a-zA-Z0-9_.-]', '_', uploaded_file.name)
-
-                # Generate a unique file ID
-                file_id = str(uuid.uuid4())
-                upload_dir = settings.UPLOAD_DIR or "uploads"
-                file_dir = os.path.join(upload_dir, file_id)
-                os.makedirs(file_dir, exist_ok=True)
-                file_path = os.path.join(file_dir, filename)
-
-                logger.info(f"Saving file locally: {file_path}")
-                with open(file_path, "wb") as out_file:
-                    out_file.write(uploaded_file.getbuffer())
-
+                backend_url = (settings.BACKEND_URL or "http://127.0.0.1:8000").rstrip("/")
                 resp = requests.post(
-                    "http://127.0.0.1:8000/process_pdf",
-                    json={"file_path": file_path, "api_key": st.session_state.api_key}
+                    f"{backend_url}/process_pdf",
+                    files={"file": (uploaded_file.name, uploaded_file.getvalue(), "application/pdf")},
+                    data={"api_key": st.session_state.api_key},
+                    timeout=120
                 )
                 if resp.status_code == 200:
                     st.success("✅ PDF processed by backend")
@@ -104,7 +90,12 @@ if user_input and st.session_state.api_key and uploaded_file is not None:
         try:
             with st.spinner("Thinking..."):
 
-                response = requests.post("http://127.0.0.1:8000/query", json={"query": user_input})
+                backend_url = (settings.BACKEND_URL or "http://127.0.0.1:8000").rstrip("/")
+                response = requests.post(
+                    f"{backend_url}/query",
+                    json={"query": user_input},
+                    timeout=120
+                )
 
                 if response.status_code == 200:
                     answer = response.json()["answer"]

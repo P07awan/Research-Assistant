@@ -57,6 +57,7 @@ Optional:
 ```
 OPENAI_EMBEDDINGS_MODEL=text-embedding-3-large
 UPLOAD_DIR=uploads
+BACKEND_URL=http://127.0.0.1:8000
 ```
 
 ## Run
@@ -79,6 +80,34 @@ streamlit run app.py
 2. Go to the API Key page and enter your OpenAI key.
 3. Use Research Assistant for topic exploration.
 4. Use Chat Bot to upload a PDF and ask questions.
+
+## Deployment
+
+### Backend on Render
+
+1. Create a new Web Service from your repo.
+2. Set the build command:
+   
+	```
+	pip install -r requirements.txt
+	```
+3. Set the start command:
+   
+	```
+	uvicorn service:app --host 0.0.0.0 --port $PORT
+	```
+4. Add env vars (Render):
+	- `UPLOAD_DIR=uploads`
+	- Optional: `OPENAI_EMBEDDINGS_MODEL=text-embedding-3-large`
+
+Note: Render disks are ephemeral. Uploads are not guaranteed to persist across deploys.
+
+### Frontend on Streamlit
+
+1. Deploy `app.py` on Streamlit Community Cloud.
+2. Set env vars in Streamlit settings:
+	- `BACKEND_URL=https://<your-render-service>.onrender.com`
+3. Provide your OpenAI API key inside the app (API Key page).
 
 ## Notes
 
