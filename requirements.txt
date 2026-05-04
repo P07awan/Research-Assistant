@@ -1,6 +1,11 @@
 # Requires Python 3.11
-faiss-cpu
+streamlit==1.33.0
+fastapi==0.110.0
+uvicorn==0.29.0
 numpy==1.26.4
+pandas==2.2.2
+faiss-cpu==1.7.4
+requests
 pandas==2.2.2 
 python-dateutil
 regex      
